@@ -8,7 +8,8 @@ import {
   Scripts,
   ScrollRestoration,
   useLoaderData,
-  useNavigation
+  useNavigation,
+  useSubmit
 } from "@remix-run/react";
 
 // existing imports
@@ -16,8 +17,8 @@ import { createEmptyContact, getContacts } from "./data";
 
 import type { LinksFunction, LoaderFunctionArgs } from "@remix-run/node";
 
-import appStylesHref from "./app.css?url";
 import { useEffect } from "react";
+import appStylesHref from "./app.css?url";
 
 export const links: LinksFunction = () => [
   { rel: "stylesheet", href: appStylesHref },
@@ -39,6 +40,12 @@ export const action = async () => {
 export default function App() {
   const navigation = useNavigation();
   const { contacts, q } = useLoaderData<typeof loader>();
+  const submit = useSubmit();
+  const searching =
+      navigation.location &&
+      new URLSearchParams(navigation.location.search).has(
+        "q"
+      );
 
   useEffect(() => {
     const searchField = document.getElementById("q");
@@ -59,7 +66,12 @@ export default function App() {
         <div id="sidebar">
           <h1>Remix Contacts</h1>
           <div>
-            <Form id="search-form" role="search">
+            <Form 
+              id="search-form" 
+              role="search" 
+              onChange={(event) =>
+                submit(event.currentTarget)
+              }>
               <input
                 id="q"
                 aria-label="Search contacts"
@@ -67,8 +79,9 @@ export default function App() {
                 type="search"
                 name="q"
                 defaultValue={q || ""}
+                className={searching ? "loading" : ""}
               />
-              <div id="search-spinner" aria-hidden hidden={true} />
+              <div id="search-spinner" aria-hidden hidden={!searching} />
             </Form>
             <Form method="post">
               <button type="submit">New</button>
