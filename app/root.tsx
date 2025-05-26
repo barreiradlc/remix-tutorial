@@ -10,7 +10,7 @@ import {
 } from "@remix-run/react";
 
 // existing imports
-import { getContacts } from "./data";
+import { createEmptyContact, getContacts } from "./data";
 
 import type { LinksFunction } from "@remix-run/node";
 
@@ -23,6 +23,11 @@ export const links: LinksFunction = () => [
 export const loader = async () => {
   const contacts = await getContacts();
   return { contacts };
+};
+
+export const action = async () => {
+  const contact = await createEmptyContact();
+  return { contact };
 };
 
 export default function App() {
