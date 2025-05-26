@@ -1,11 +1,11 @@
 import { Form, useLoaderData } from "@remix-run/react";
 import type { FunctionComponent } from "react";
-import { getContact } from "../data";
+import { getContact, updateContact } from "../data";
 
 import type { ContactRecord } from "../data";
 
 import invariant from "tiny-invariant";
-import { LoaderFunctionArgs } from "@remix-run/node";
+import { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 
 export const loader = async ({
   params,
@@ -16,6 +16,17 @@ export const loader = async ({
     throw new Response("Not Found", { status: 404 });
   }
   return { contact };
+};
+
+export const action = async ({
+  params,
+  request,
+}: ActionFunctionArgs) => {
+  invariant(params.contactId, "Missing contactId param");
+  const formData = await request.formData();
+  return updateContact(params.contactId, {
+    favorite: formData.get("favorite") === "true",
+  });
 };
 
 export default function Contact() {

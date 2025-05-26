@@ -7,6 +7,7 @@ import {
   redirect,
   Scripts,
   ScrollRestoration,
+  useFetcher,
   useLoaderData,
   useNavigation,
   useSubmit
@@ -46,6 +47,8 @@ export default function App() {
       new URLSearchParams(navigation.location.search).has(
         "q"
       );
+  const fetcher = useFetcher();
+
 
   useEffect(() => {
     const searchField = document.getElementById("q");
@@ -66,12 +69,15 @@ export default function App() {
         <div id="sidebar">
           <h1>Remix Contacts</h1>
           <div>
-            <Form 
+            <fetcher.Form 
               id="search-form" 
               role="search" 
-              onChange={(event) =>
-                submit(event.currentTarget)
-              }>
+              onChange={(event) => {
+                const isFirstSearch = q === null;
+                submit(event.currentTarget, {
+                  replace: !isFirstSearch,
+                });
+              }}>
               <input
                 id="q"
                 aria-label="Search contacts"
@@ -82,7 +88,7 @@ export default function App() {
                 className={searching ? "loading" : ""}
               />
               <div id="search-spinner" aria-hidden hidden={!searching} />
-            </Form>
+            </fetcher.Form>
             <Form method="post">
               <button type="submit">New</button>
             </Form>
